@@ -1,8 +1,5 @@
 const { Router } = require('express')
-const { getAllCubes, getCube, updateCubes, getCubeWithAccesssories } = require('../controllers/cubes')
-const { getAccessories } = require('../controllers/accessories')
-const Cube = require('../models/cube')
-const Accessory = require('../models/accessory')
+const { getAllCubes } = require('../controllers/cubes')
 
 const router = Router()
 
@@ -20,8 +17,6 @@ router.get('/about', (req, res) => {
         title: 'About this project'
     })
 })
-
-
 
 router.post('/search', async (req, res) => {
     const {
