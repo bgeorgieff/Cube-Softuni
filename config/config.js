@@ -1,8 +1,8 @@
 module.exports = {
     development: {
-        port: process.env.PORT || 4000,
-        privateKey: 'CUBE-WORKSHOP',
-        dataBaseUrl: `mongodb+srv://Blagovest:${process.env.DB_PASSWORD}@cluster0.tljof.mongodb.net/CubicleDB?retryWrites=true&w=majority`
+        port: process.env.PORT,
+        privateKey: process.env.PRIVATE_KEY,
+        dataBaseUrl: process.env.DATABASE_URL
     },
     production: {}
 }
