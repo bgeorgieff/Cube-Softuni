@@ -3,18 +3,20 @@ const env = process.env.NODE_ENV || 'development'
 const express = require('express')
 const { getCubeWithAccesssories } = require('../controllers/cubes')
 const Cube = require('../models/cube')
+const { isAuthenticated, getUserStates, isAuthenticatedJSON } = require('../controllers/user')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')[env]
 
 const router = express.Router()
 
-router.get('/create', (req, res) => {
+router.get('/create', isAuthenticated, getUserStates, (req, res) => {
     res.render('create', {
-        title: 'Create a new cube'
+        title: 'Create a new cube',
+        isLoggedIn: req.isLoggedIn
     })
 })
 
-router.post('/create', (req, res) => {
+router.post('/create', isAuthenticatedJSON, (req, res) => {
     const {
         name, 
         description,
@@ -37,22 +39,26 @@ router.post('/create', (req, res) => {
     })
 })
 
-
-router.get('/details/:id', async (req, res) => {
+router.get('/details/:id', getUserStates, async (req, res) => {
     const cube = await getCubeWithAccesssories(req.params.id)
 
     res.render('details', {
         title: 'Cube details',
-        ...cube
+        ...cube,
+        isLoggedIn: req.isLoggedIn
     })
 })
 
-router.get('/edit', (req, res) => {
-    res.render('editCubePage')
+router.get('/edit', isAuthenticated, getUserStates, (req, res) => {
+    res.render('editCubePage', {
+        isLoggedIn: req.isLoggedIn
+    })
 })
 
-router.get('/delete', (req, res) => {
-    res.render('deleteCubePage')
+router.get('/delete', isAuthenticated, getUserStates, (req, res) => {
+    res.render('deleteCubePage', {
+        isLoggedIn: req.isLoggedIn
+    })
 })
 
 module.exports = router

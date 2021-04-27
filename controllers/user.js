@@ -58,7 +58,68 @@ const verifyUser = async (req, res) => {
     return status
 }
 
+const isAuthenticated = (req, res, next) => {
+    const token = req.cookies['aid']
+    if(!token) {
+        return res.redirect('/')
+    }
+
+    try {
+        jwt.verify(token, config.privateKey)
+        next()
+    } catch(e) {
+        res.redirect('/')
+    }
+}
+
+const guestAccess = (req, res, next) => {
+    const token = req.cookies['aid']
+    if(token) {
+        return res.redirect('/')
+    }
+    next()
+}
+
+const getUserStates = (req, res, next) => {
+    const token = req.cookies['aid']
+    if(!token) {
+        req.isLoggedIn = false
+    }
+    
+    try {
+        jwt.verify(token, config.privateKey)
+        req.isLoggedIn = true
+    } catch(e) {
+        req.isLoggedIn = false
+    }
+    
+    next()
+}
+
+
+const isAuthenticatedJSON = (req, res, next) => {
+    const token = req.cookies['aid']
+    if(!token) {
+        return res.json({
+            error: 'Not Authenticated'
+        })
+    }
+
+    try {
+        jwt.verify(token, config.privateKey)
+        next()
+    } catch(e) {
+        res.json({
+            error: 'Not Authenticated'
+        })
+    }
+}
+
 module.exports = {
     saveUser,
-    verifyUser
+    verifyUser,
+    isAuthenticated,
+    guestAccess,
+    getUserStates,
+    isAuthenticatedJSON
 }

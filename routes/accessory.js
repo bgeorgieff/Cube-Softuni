@@ -1,17 +1,19 @@
 const express = require('express')
 const { getCube, updateCubes } = require('../controllers/cubes')
 const { getAccessories } = require('../controllers/accessories')
+const { isAuthenticated, getUserStates, isAuthenticatedJSON } = require('../controllers/user')
 const Accessory = require('../models/accessory')
 
 const router = express.Router()
 
-router.get('/create/accessory', (req, res) => {
+router.get('/create/accessory', isAuthenticated, getUserStates, (req, res) => {
     res.render('createAccessory', {
-        title: 'Create'
+        title: 'Create',
+        isLoggedIn: req.isLoggedIn
     })
 })
 
-router.post('/create/accessory', async (req, res) => {
+router.post('/create/accessory', isAuthenticatedJSON, async (req, res) => {
     const {
         name,
         description, 
@@ -31,7 +33,7 @@ router.post('/create/accessory', async (req, res) => {
 
 })
 
-router.get('/attach/accessory/:id', async (req, res) => {
+router.get('/attach/accessory/:id', isAuthenticated, getUserStates, async (req, res) => {
     const cube = await getCube(req.params.id)
     const accessories = await getAccessories()
     const cubeAccesssories = cube.accessories.map(acc => acc._id.valueOf().toString())
@@ -45,11 +47,12 @@ router.get('/attach/accessory/:id', async (req, res) => {
         id: req.params.id,
         ...cube,
         accessories: notAttached,
-        canAddAccessory: cube.accessories.length !== accessories.length && accessories.length > 0
+        canAddAccessory: cube.accessories.length !== accessories.length && accessories.length > 0,
+        isLoggedIn: req.isLoggedIn
     })
 })
 
-router.post('/attach/accessory/:id', async (req, res) => {
+router.post('/attach/accessory/:id', isAuthenticatedJSON, async (req, res) => {
     const {
         accessory
     } = req.body
