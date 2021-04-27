@@ -23,7 +23,11 @@ const CubeSchema = new mongoose.Schema({
     accessories: [{
         type: 'ObjectId',
         ref: 'Accessory'
-    }]
+    }],
+    creatorID: {
+        type: 'ObjectID',
+        ref: 'User'
+    }
 })
 
 CubeSchema.path('imageUrl').validate(function (url) {
