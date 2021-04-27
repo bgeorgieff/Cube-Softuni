@@ -1,11 +1,12 @@
 const env = process.env.NODE_ENV || 'development'
 
 const express = require('express')
-const { getCubeWithAccesssories } = require('../controllers/cubes')
+const { getCubeWithAccesssories, getAllCubes } = require('../controllers/cubes')
 const Cube = require('../models/cube')
 const { isAuthenticated, getUserStates, isAuthenticatedJSON } = require('../controllers/user')
 const jwt = require('jsonwebtoken')
 const config = require('../config/config')[env]
+const { deleteOne } = require('../models/cube')
 
 const router = express.Router()
 
@@ -55,9 +56,20 @@ router.get('/edit', isAuthenticated, getUserStates, (req, res) => {
     })
 })
 
-router.get('/delete', isAuthenticated, getUserStates, (req, res) => {
+router.get('/delete/:id', isAuthenticated, getUserStates, async (req, res) => {
+    const cube = await getCubeWithAccesssories(req.params.id)
+
     res.render('deleteCubePage', {
-        isLoggedIn: req.isLoggedIn
+        isLoggedIn: req.isLoggedIn,
+        ...cube
+    })
+})
+
+router.post('/delete/:id', isAuthenticatedJSON, async (req, res) => {
+    const cubes = await getCubeWithAccesssories(req.params.id)
+
+    Cube.findByIdAndRemove({_id: cubes._id}, () => {
+        res.redirect('/')
     })
 })
 
