@@ -41,6 +41,11 @@ router.post('/search', async (req, res) => {
     })
 })
 
+router.get('/logout', (req, res) => {
+    res.clearCookie('aid')
+    res.redirect('/')
+})
+
 router.get('*', (req, res) => {
     res.render('404', {
         title: 'Page not found',
